@@ -303,50 +303,96 @@ docker-compose exec order-service /bin/sh
 
 ---
 
-## 🛑 Stopping Services
+## 🛑 Stop Running Application (App + Containers)
 
-### Stop Docker Compose (All Services)
+Use these commands from project root:
+`D:\Intelij-Projects\High-Performance Spring Boot Microservices Architecture\spring-cloud-microservices-platform`
 
-```powershell
-docker-compose down
-```
+### 1) Stop Services Started in Manual Mode (non-Docker)
 
-**This:**
-- Stops all containers
-- Removes networks
-- Data in containers is lost (persisted volumes are kept)
+If you started services with `spring-boot:run`, stop each terminal with `Ctrl + C`.
 
-### Stop Infrastructure Only
+If a Java service is still running in background, find and stop it:
 
 ```powershell
-docker-compose -f docker-compose-infra.yml down
+# list Java processes
+Get-Process java
+
+# stop a specific process
+Stop-Process -Id <PID> -Force
 ```
 
-### Stop Individual Services (Manual Mode)
+### 2) Stop Containers Started by Compose (keep data/volumes)
 
-In each terminal window where a service is running, press `Ctrl+C` to stop it.
+```powershell
+docker compose -f docker-compose.yml down
+docker compose -f docker-compose-infra.yml down
+```
+
+### 3) Stop Containers + Remove Volumes (full reset)
+
+```powershell
+docker compose -f docker-compose.yml down -v --remove-orphans
+docker compose -f docker-compose-infra.yml down -v --remove-orphans
+```
+
+### 4) Emergency: Stop All Running Docker Containers on your machine
+
+```powershell
+$ids = docker ps -q
+if ($ids) { docker stop $ids } else { Write-Host "No running containers." }
+```
 
 ---
 
-## 🧹 Clean Up
+## 🧹 Remove Containers and Images Completely
 
-### Remove All Docker Volumes (Clean Slate)
-
-```powershell
-docker-compose down -v
-```
-
-### Remove Docker Images
+### 1) Remove Compose-created images for this project
 
 ```powershell
-docker rmi api-gateway discovery-server config-server order-service product-service notification-service
+docker compose -f docker-compose.yml down --rmi local
+docker compose -f docker-compose-infra.yml down --rmi local
 ```
 
-### Clean Maven Build Artifacts
+### 2) Remove specific infrastructure images used by this project
+
+```powershell
+docker image rm -f confluentinc/cp-zookeeper:7.6.1
+docker image rm -f confluentinc/cp-kafka:7.6.1
+docker image rm -f openzipkin/zipkin:latest
+docker image rm -f prom/prometheus:latest
+docker image rm -f grafana/grafana:latest
+```
+
+### 3) Optional: remove dangling/unused images system-wide
+
+```powershell
+docker image prune -a -f
+```
+
+### 4) Verify everything is stopped/removed
+
+```powershell
+docker ps
+docker ps -a
+docker images
+```
+
+### 5) Clean Maven build artifacts
 
 ```powershell
 .\mvnw.cmd clean
 ```
+
+### 6) Reclaim Docker/WSL memory immediately (if RAM still looks high)
+
+```powershell
+docker system df
+docker system prune -a --volumes -f
+wsl --shutdown
+```
+
+After `wsl --shutdown`, reopen Docker Desktop.
 
 ---
 
