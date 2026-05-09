@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: order-service
+  config:
+    import: optional:configserver:${SPRING_CONFIG_IMPORT_URL:http://localhost:8888}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAPSERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+resilience4j:
+  circuitbreaker:
+    instances:
+      product-service:
+        sliding-window-size: 5
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+app:
+  kafka:
+    topic:
+      orderPlaced: order-placed
