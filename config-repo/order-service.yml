@@ -1,0 +1,4 @@
+app:
+  kafka:
+    topic:
+      orderPlaced: order-placed
