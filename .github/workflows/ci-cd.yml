@@ -45,18 +45,18 @@ jobs:
             docker build -t ${{ secrets.DOCKER_USERNAME }}/$service:latest ./$service
             docker push ${{ secrets.DOCKER_USERNAME }}/$service:latest
           done
-  deploy-to-k8s:
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-      - name: Configure Kubernetes
-        run: | 
-         mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-      - name: Deploy to Kubernetes
-        run: kubectl apply -f k8s/ -n microservices
+#  deploy-to-k8s:
+#    needs: docker-build-push
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main'
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#      - name: Set up kubectl
+#        uses: azure/setup-kubectl@v4
+#      - name: Configure Kubernetes # Add this to according to your config
+#        run: | 
+#         mkdir -p ~/.kube
+#          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+#      - name: Deploy to Kubernetes
+#        run: kubectl apply -f k8s/ -n microservices
