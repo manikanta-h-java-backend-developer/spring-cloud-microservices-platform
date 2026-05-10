@@ -54,7 +54,7 @@ The platform includes everything needed for a production-grade microservices env
 
 ---
 
-## Application Architecture
+## Architecture
 
 ```
                         ┌─────────────────────────────────────────────┐
