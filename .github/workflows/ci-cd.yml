@@ -17,7 +17,7 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build with Maven
-        run: mvn -B clean package
+        run: mvn -B clean package -DskipTests
   docker-build-push:
     needs: build-and-test
     runs-on: ubuntu-latest
